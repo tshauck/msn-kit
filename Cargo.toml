@@ -1,0 +1,16 @@
+[package]
+name = "msn-kit"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+test = true
+
+[[bin]]
+name = "mm"
+path = "./src/main.rs"
+
+[dependencies]
+clap = "3.0.0-beta.2"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }

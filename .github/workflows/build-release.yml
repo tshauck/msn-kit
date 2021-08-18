@@ -1,0 +1,230 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  pre-flight:
+    name: pre-flight
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump env
+        run: env | sort
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Create artifacts directory
+        run: mkdir artifacts
+      - name: Set env
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - name: Save version number to artifact
+        run: echo "${{ env.VERSION }}" > artifacts/release-version
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
+  build-release:
+    name: build-release
+    needs: ["pre-flight"]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [macos-x86, linux-x86, linux-arm, win-msvc]
+        include:
+          - build: macos-x86
+            os: macos-latest
+            rust: nightly
+            target: x86_64-apple-darwin
+          - build: linux-x86
+            os: ubuntu-18.04
+            rust: nightly
+            target: x86_64-unknown-linux-musl
+          - build: linux-arm
+            os: ubuntu-18.04
+            rust: nightly
+            target: aarch64-unknown-linux-gnu
+          - build: win-msvc
+            os: windows-2019
+            rust: nightly
+            target: x86_64-pc-windows-msvc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Install linux dependencies
+        if: matrix.build == 'linux-x86'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends musl-tools
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+
+      - name: Use Cross
+        run: |
+          cargo install cross
+
+      - name: Build release binary
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Strip release binary (arm)
+        if: matrix.build == 'linux-arm'
+        run: |
+          docker run --rm -v $PWD/target:/target:Z rustembedded/cross:${{ matrix.target }} aarch64-linux-gnu-strip /target/${{ matrix.target}}/release/mm
+
+      - name: Strip release binary (x86)
+        if: matrix.build == 'linux-x86' || matrix.build == 'macos-x86'
+        run: strip "target/${{ matrix.target }}/release/mm"
+
+      - name: Get release version
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
+
+      - name: Prepare for Upload
+        shell: bash
+        run: |
+          release_version="$(cat artifacts/release-version)"
+
+          ARCHIVE_DIR=archive
+          mkdir "$ARCHIVE_DIR"
+
+          if [ "${{ matrix.os }}" = "windows-2019" ]; then
+              target_path="target/${{ matrix.target }}/release/mm.exe"
+              asset_name="mm-${release_version}-${{ matrix.target }}.exe.zip"
+
+              cp ${target_path} $ARCHIVE_DIR
+              7z -y a "${asset_name}" "$ARCHIVE_DIR"
+          else
+              target_path="target/${{ matrix.target }}/release/mm"
+              asset_name="mm-${release_version}-${{ matrix.target }}.tar.gz"
+
+              cp ${target_path} $ARCHIVE_DIR
+              tar czvf "${asset_name}" -C "target/${{ matrix.target }}/release" "mm"
+          fi
+
+          if [ "${{ matrix.os }}" = "windows-2019" ]; then
+              sha=$(sha256sum ${asset_name} | cut -d " " -f 1)
+              echo "${sha} ${asset_name}" > sha256sum.txt
+
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+              sha=$(shasum -a 256 ${asset_name} | cut -d " " -f 1)
+              echo "${sha} ${asset_name}" > sha256sum.txt
+
+          else
+              sha=$(sha256sum ${asset_name} | cut -d " " -f 1)
+              echo "${sha} ${asset_name}" > sha256sum.txt
+          fi
+
+          echo "TARGET_PATH=${target_path}" >> $GITHUB_ENV
+          echo "ASSET_NAME=${asset_name}" >> $GITHUB_ENV
+
+          mkdir "${asset_name}-folder"
+          mv sha256sum.txt "${asset_name}-folder"/sha256sum.txt
+          mv ${asset_name} "${asset_name}-folder"/"${asset_name}"
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.ASSET_NAME }}
+          path: ${{ env.ASSET_NAME }}-folder
+          if-no-files-found: error
+
+  finish-release:
+    name: finish-release
+    needs: ["build-release"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.7"
+      - uses: actions/download-artifact@v2
+        with:
+          path: generated-artifacts
+      - name: Generate Release
+        shell: bash
+        run: |
+          #python -m pip install --upgrade pip
+          #pip install commitizen
+
+          ls -R generated-artifacts
+
+          release_version="$(cat generated-artifacts/artifacts/release-version)"
+          echo "RELEASE_VERSION=${release_version}" >> $GITHUB_ENV
+
+          #cz ch > RELEASE.md
+          #echo "" >> RELEASE.md
+          echo "\`\`\`" >> RELEASE.md
+          cat ./generated-artifacts/mm-${release_version}-aarch64-unknown-linux-gnu.tar.gz/sha256sum.txt >> RELEASE.md
+          cat ./generated-artifacts/mm-${release_version}-x86_64-apple-darwin.tar.gz/sha256sum.txt >> RELEASE.md
+          cat ./generated-artifacts/mm-${release_version}-x86_64-pc-windows-msvc.exe.zip/sha256sum.txt >> RELEASE.md
+          cat ./generated-artifacts/mm-${release_version}-x86_64-unknown-linux-musl.tar.gz/sha256sum.txt >> RELEASE.md
+          echo "\`\`\`" >> RELEASE.md
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.RELEASE_VERSION }}
+          release_name: Release ${{ env.RELEASE_VERSION }}
+          body_path: RELEASE.md
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset (aarch64-unknown-linux-gnu)
+        id: upload-release-asset-aarch64-unknown-linux-gnu
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./generated-artifacts/mm-${{ env.RELEASE_VERSION }}-aarch64-unknown-linux-gnu.tar.gz/mm-${{ env.RELEASE_VERSION }}-aarch64-unknown-linux-gnu.tar.gz
+          asset_name: mm-${{ env.RELEASE_VERSION }}-aarch64-unknown-linux-gnu.tar.gz
+          asset_content_type: application/gzip
+      - name: Upload Release Asset (x86_64-pc-windows-msvc)
+        id: upload-release-asset-x86_64-pc-windows-msvc
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./generated-artifacts/mm-${{ env.RELEASE_VERSION }}-x86_64-pc-windows-msvc.exe.zip/mm-${{ env.RELEASE_VERSION }}-x86_64-pc-windows-msvc.exe.zip
+          asset_name: mm-${{ env.RELEASE_VERSION }}-x86_64-pc-windows-msvc.exe.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset (x86_64-apple-darwin)
+        id: upload-release-asset-x86_64-apple-darwin
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./generated-artifacts/mm-${{ env.RELEASE_VERSION }}-x86_64-apple-darwin.tar.gz/mm-${{ env.RELEASE_VERSION }}-x86_64-apple-darwin.tar.gz
+          asset_name: mm-${{ env.RELEASE_VERSION }}-x86_64-apple-darwin.tar.gz
+          asset_content_type: application/gzip
+      - name: Upload Release Asset (x86_64-unknown-linux-musl)
+        id: upload-release-asset-x86_64-unknown-linux-musl
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./generated-artifacts/mm-${{ env.RELEASE_VERSION }}-x86_64-unknown-linux-musl.tar.gz/mm-${{ env.RELEASE_VERSION }}-x86_64-unknown-linux-musl.tar.gz
+          asset_name: mm-${{ env.RELEASE_VERSION }}-x86_64-unknown-linux-musl.tar.gz
+          asset_content_type: application/gzip
