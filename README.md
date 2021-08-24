@@ -39,7 +39,8 @@ SUBCOMMANDS:
 ```
 
 Yours may look different depending on the version that was installed vs the
-last time this README was updated 😄.
+last time this README was updated 😄. You'll also likely want to place `mm` is a
+location that is on your `PATH`.
 
 ## Installation
 
@@ -56,3 +57,13 @@ Currently there are builds for:
 * ARM Linux
 
 ## Usage
+
+A few things to note about the CLI's organization.
+
+* The CLI is organized as a single entrypoint at `mm`, then subcommands under
+  that, e.g. `mm stats`, `mm head`, `mm metadata-filter`, etc. They all take a
+  `-h` flag for help.
+* Many commands can take a `-o` global parameter (i.e. passed directly to `mm`)
+  to specify the output format. `mgf` is an option which outputs what's
+  expected. `json` is also an option which will output json records, one per
+  line.
