@@ -7,6 +7,7 @@
 * [Quick Start for CLI](#quick-start-for-cli)
 * [Installation](#installation)
 * [Usage](#usage)
+* [Status Badges](#status-badges)
 
 <!-- vim-markdown-toc -->
 
@@ -45,7 +46,7 @@ location that is on your `PATH`.
 ## Installation
 
 Releases are made to GitHub's release page:
-https://github.com/tshauck/msn-kit/releases.
+https://github.com/tshauck/msn-kit/releases/latest.
 
 From there, download the version you'd like to use for the appropriate platform.
 
@@ -67,3 +68,10 @@ A few things to note about the CLI's organization.
   to specify the output format. `mgf` is an option which outputs what's
   expected. `json` is also an option which will output json records, one per
   line.
+
+## Status Badges
+
+| Process      | Status |
+| ----------- | ----------- |
+| Github Release Build | ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/tshauck/msn-kit/Build%20Release?style=for-the-badge) |
+| Github Tests | ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/tshauck/msn-kit/Run%20Tests?style=for-the-badge) |
