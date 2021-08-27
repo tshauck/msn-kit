@@ -227,6 +227,9 @@ BEGIN IONS
 PEPMASS=898.727
 SCANS=1
 END IONS
+BEGIN IONS
+13.00	1.0
+END IONS
 ";
 
     const SPECTRUM_SIMPLE: &str = r#"
@@ -240,6 +243,11 @@ END IONS
             "metadata": {"PEPMASS": "898.727", "SCANS": "1"},
             "mz": [],
             "intensities": []
+        },
+        {
+            "metadata": {},
+            "mz": [13.0],
+            "intensities": [1.0]
         }
     ]
     "#;
