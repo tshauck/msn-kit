@@ -216,36 +216,43 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::HashMap;
 
-    const MGF_FILE: &[u8] = b"BEGIN IONS
+    const MGF_FILE_SIMPLE: &[u8] = b"BEGIN IONS
 PEPMASS=898.727
 SCANS=1
 13.00	1.0
 14.00	1.0
 END IONS
+BEGIN IONS
+PEPMASS=898.727
+SCANS=1
+END IONS
 ";
+
+    const SPECTRUM_SIMPLE: &str = r#"
+    [
+        {
+            "metadata": {"PEPMASS": "898.727", "SCANS": "1"},
+            "mz": [13.0, 14.0],
+            "intensities": [1.0, 1.0]
+        },
+        {
+            "metadata": {"PEPMASS": "898.727", "SCANS": "1"},
+            "mz": [],
+            "intensities": []
+        }
+    ]
+    "#;
 
     #[test]
     fn test_reader() {
-        let reader = MGFReader::new(MGF_FILE);
+        let test_s: Vec<Spectrum> = serde_json::from_str(SPECTRUM_SIMPLE).unwrap();
 
-        let mut test_metadata = HashMap::<String, String>::new();
-        test_metadata.insert(String::from("PEPMASS"), String::from("898.727"));
-        test_metadata.insert(String::from("SCANS"), String::from("1"));
-
-        let mz = vec![13.0, 14.0];
-        let intensities = vec![1.0, 1.0];
-        let test_s = Spectrum::new(test_metadata, mz, intensities);
-
+        let reader = MGFReader::new(MGF_FILE_SIMPLE);
         let spectra = reader.spectra();
 
-        for spectrum in spectra {
-            let is_ok = spectrum.is_ok();
-            assert!(is_ok);
+        let filter_s: Vec<Spectrum> = spectra.map(|s| s.unwrap()).collect();
 
-            let found_s = spectrum.unwrap();
-            assert_eq!(test_s, found_s);
-        }
+        assert_eq!(test_s, filter_s);
     }
 }
