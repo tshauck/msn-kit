@@ -2,6 +2,7 @@
   "commitizen": {
     "name": "cz_conventional_commits",
     "version": "0.1.6",
-    "tag_format": "v$version"
+    "tag_format": "v$version",
+    "version_files": ["./Cargo.toml:version"]
   }
 }
