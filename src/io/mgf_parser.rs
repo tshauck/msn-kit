@@ -54,14 +54,29 @@ where
             return Ok(());
         };
 
-        if line != "BEGIN IONS\n" {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("Expected 'BEGIN IONS' to start, got {}", line),
-            ));
-        }
+        loop {
+            if line == "\n" {
+                line.clear();
+                self.reader.read_line(&mut line)?;
+                continue;
+            }
 
-        line.clear();
+            if line.is_empty() {
+                return Ok(());
+            }
+
+            if line == "BEGIN IONS\n" {
+                line.clear();
+                break;
+            }
+
+            if line != "BEGIN IONS\n" {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("Expected 'BEGIN IONS' to start, got {}", line),
+                ));
+            }
+        }
 
         loop {
             self.reader.read_line(&mut line)?;
@@ -150,7 +165,7 @@ impl<W: Write> MGFWriter<W> {
             Ok(_) => Ok(()),
             Err(_) => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
-                "Error parsing (replace me with propagated error.",
+                "Error writing json for spectrum.",
             )),
         }
     }
@@ -205,10 +220,7 @@ where
         match resp {
             Ok(()) if record.is_empty() => None,
             Ok(()) => Some(Ok(record)),
-            Err(_) => Some(Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "Error parsing (replace me with propagated error.",
-            ))),
+            Err(e) => Some(Err(std::io::Error::new(std::io::ErrorKind::Other, e))),
         }
     }
 }
@@ -223,13 +235,20 @@ SCANS=1
 13.00	1.0
 14.00	1.0
 END IONS
+
 BEGIN IONS
 PEPMASS=898.727
 SCANS=1
 END IONS
+
+
+
+
 BEGIN IONS
 13.00	1.0
 END IONS
+
+
 ";
 
     const SPECTRUM_SIMPLE: &str = r#"
