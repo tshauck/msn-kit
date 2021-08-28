@@ -3,8 +3,6 @@
     "name": "cz_conventional_commits",
     "version": "0.2.1",
     "tag_format": "v$version",
-    "version_files": [
-      "./Cargo.toml:version"
-    ]
+    "version_files": ["./msn-kit/Cargo.toml:version", "./msn-kit-cli/Cargo.toml:version"]
   }
 }
