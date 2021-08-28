@@ -5,7 +5,8 @@
     "tag_format": "v$version",
     "version_files": [
       "./msn-kit/Cargo.toml:version",
-      "./msn-kit-cli/Cargo.toml:version"
+      "./msn-kit-cli/Cargo.toml:version",
+      "./msn-kit-cli/src/main.rs:version"
     ]
   }
 }
