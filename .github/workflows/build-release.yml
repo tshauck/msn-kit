@@ -148,6 +148,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Publish to Cargo
+        working-directory: .
         run: |
           cargo login
           cargo publish
