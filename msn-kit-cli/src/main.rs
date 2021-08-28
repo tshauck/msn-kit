@@ -5,8 +5,9 @@ use std::fs::File;
 use std::io::{stdin, stdout};
 use std::path::PathBuf;
 
+mod cmds;
+
 use clap::Clap;
-use msn_kit::cmds;
 use msn_kit::io;
 
 #[derive(Clap)]

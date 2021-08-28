@@ -8,7 +8,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use crate::{io, spectrum};
+use msn_kit::{io, spectrum};
 
 impl SummaryStatistics {
     fn new() -> Self {

@@ -1,27 +1,6 @@
-[package]
-name = "msn-kit"
-version = "0.2.1"
-edition = "2018"
-license = "MIT"
-description = "Library and CLI for working with Mass Spec data."
-homepage = "http://www.github.com/tshauck/msn-kit"
-documentation = "https://docs.rs/msn-kit/0.1.0/msn_kit/"
-repository = "http://www.github.com/tshauck/msn-kit"
-readme = "README.md"
-include = [
-	"src/**/*",
-	"Cargo.toml",
-	"README.md"
+[workspace]
+
+members = [
+    "msn-kit",
+    "msn-kit-cli"
 ]
-
-[lib]
-test = true
-
-[[bin]]
-name = "mm"
-path = "./src/main.rs"
-
-[dependencies]
-clap = "3.0.0-beta.2"
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }

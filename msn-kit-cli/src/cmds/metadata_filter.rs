@@ -1,6 +1,9 @@
+// (c) Copyright 2021 Trent Hauck
+// All Rights Reserved
+
 use std::io::{Read, Write};
 
-use crate::io;
+use msn_kit::io;
 
 /// Write data from input to output, while filtering for key by value.
 ///

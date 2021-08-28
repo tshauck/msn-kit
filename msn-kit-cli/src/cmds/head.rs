@@ -1,6 +1,9 @@
+// (c) Copyright 2021 Trent Hauck
+// All Rights Reserved
+
 use std::io::{Read, Write};
 
-use crate::io;
+use msn_kit::io;
 
 /// Take the first `number` records from input and write them to output.
 ///
