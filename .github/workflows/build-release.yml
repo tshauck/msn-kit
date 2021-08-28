@@ -149,6 +149,7 @@ jobs:
     steps:
       - name: Publish to Cargo
         run: |
+          cargo login
           cargo publish
 
   finish-release:
