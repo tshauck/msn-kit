@@ -152,9 +152,10 @@ jobs:
         with:
           fetch-depth: 1
       - name: Publish to Cargo
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
-          cargo login
-          cargo publish
+          cargo publish --token $CARGO_REGISTRY_TOKEN
 
   finish-release:
     name: finish-release
