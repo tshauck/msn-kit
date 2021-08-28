@@ -29,7 +29,7 @@ enum SubCommand {
     #[clap(about = "Similar to head(1) in that it can output the top n records from an MGF file")]
     Head(Head),
 
-    #[clap(about = "Select spetra based on the key value pairs in the metadata")]
+    #[clap(about = "Select spectra based on the key value pairs in the metadata")]
     MetadataFilter(FilterByKeyValue),
 
     #[clap(about = "Compute stats for inputs")]

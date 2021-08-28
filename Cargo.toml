@@ -2,6 +2,12 @@
 name = "msn-kit"
 version = "0.1.0"
 edition = "2018"
+license = "MIT"
+description = "Library and CLI for working with Mass Spec data."
+homepage = "http://www.github.com/tshauck/msn-kit"
+documentation = "http://www.github.com/tshauck/msn-kit"
+repository = "http://www.github.com/tshauck/msn-kit"
+readme = "README.md"
 
 [lib]
 test = true

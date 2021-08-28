@@ -9,7 +9,6 @@ use crate::io;
 /// * `input` - The input reader object.
 /// * `output` - The output writer object.
 /// * `number` - How many records to keep.
-
 pub fn head<R: Read, W: Write>(
     input: R,
     mgf_writer: &mut io::mgf_parser::MGFWriter<W>,

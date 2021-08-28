@@ -14,7 +14,7 @@ impl<R> MGFReader<std::io::BufReader<R>>
 where
     R: std::io::Read,
 {
-    /// Create a new MGFReader from an object that impelemnts Read.
+    /// Create a new MGFReader from an object that implements Read.
     ///
     /// # Arguments
     ///
