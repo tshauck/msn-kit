@@ -111,7 +111,7 @@ checksum = "a7f823d141fe0a24df1e23b4af4e3c7ba9e5966ec514ea068c93024aa7deb765"
 
 [[package]]
 name = "msn-kit"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "serde",
  "serde_json",
@@ -119,7 +119,7 @@ dependencies = [
 
 [[package]]
 name = "msn-kit-cli"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "clap",
  "msn-kit",
