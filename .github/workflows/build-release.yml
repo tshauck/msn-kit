@@ -147,8 +147,11 @@ jobs:
     needs: ["build-release"]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
       - name: Publish to Cargo
-        working-directory: .
         run: |
           cargo login
           cargo publish
