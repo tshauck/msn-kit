@@ -1,9 +1,21 @@
 // (c) Copyright 2021 Trent Hauck
 // All Rights Reserved
+//! A Spectrum is a set of peaks and associated metadata.
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+/// # Examples
+///
+/// The simplest spectrum with a single peak.
+///
+/// ```
+/// use std::collections::HashMap;
+///
+/// let s = msn_kit::spectrum::Spectrum::new(HashMap::<String, String>::new(), vec![1.0], vec![1.0]);
+/// assert_eq!(s.mz, vec![1.0]);
+/// assert_eq!(s.intensities, vec![1.0]);
+/// ```
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Spectrum {
     pub metadata: HashMap<String, String>,
