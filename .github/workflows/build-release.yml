@@ -87,6 +87,10 @@ jobs:
         if: matrix.build == 'linux-x86' || matrix.build == 'macos-x86'
         run: strip "target/${{ matrix.target }}/release/mm"
 
+      - name: Publish to Cargo
+        run: |
+          cargo publish
+
       - name: Get release version
         uses: actions/download-artifact@v2
         with:
