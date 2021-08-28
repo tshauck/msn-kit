@@ -17,7 +17,7 @@ After downloading the executable, use `--help` to see the commands and options.
 
 ```console
 $ mm --help
-msn-kit 1.0
+msn-kit 0.2.3
 Trent Hauck <trent@trenthauck.com>
 CLI for dealing with MGF files.
 
@@ -29,14 +29,14 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-    -o <output-format>        The output file to write to [default: mgf] [possible values: json,
-                              mgf]
+    -o <output-format>        The output file to write to [default: mgf]
 
 SUBCOMMANDS:
     head               Similar to head(1) in that it can output the top n records from an MGF
                        file
     help               Prints this message or the help of the given subcommand(s)
-    metadata-filter    Select spetra based on the key value pairs in the metadata
+    metadata-filter    Select spectra based on the key value pairs in the metadata
+    stats              Compute stats for inputs
 ```
 
 Yours may look different depending on the version that was installed vs the

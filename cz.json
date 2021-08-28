@@ -7,6 +7,7 @@
       "./msn-kit/Cargo.toml:version",
       "./msn-kit-cli/Cargo.toml:version",
       "./msn-kit-cli/src/main.rs:version"
-    ]
+    ],
+    "use_shortcuts": true
   }
 }
