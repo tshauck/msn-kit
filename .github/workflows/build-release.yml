@@ -87,10 +87,6 @@ jobs:
         if: matrix.build == 'linux-x86' || matrix.build == 'macos-x86'
         run: strip "target/${{ matrix.target }}/release/mm"
 
-      - name: Publish to Cargo
-        run: |
-          cargo publish
-
       - name: Get release version
         uses: actions/download-artifact@v2
         with:
@@ -146,9 +142,18 @@ jobs:
           path: ${{ env.ASSET_NAME }}-folder
           if-no-files-found: error
 
+  publish-cargo:
+    name: publish-cargo
+    needs: ["build-release"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish to Cargo
+        run: |
+          cargo publish
+
   finish-release:
     name: finish-release
-    needs: ["build-release"]
+    needs: ["publish-cargo"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
