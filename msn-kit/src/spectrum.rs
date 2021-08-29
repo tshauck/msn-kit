@@ -55,4 +55,22 @@ impl Spectrum {
     pub fn is_empty(&self) -> bool {
         self.mz.is_empty() && self.intensities.is_empty() && self.metadata.is_empty()
     }
+
+    /// Adds a key/value pair to the metadata.
+    pub fn add_metadata_field(&mut self, s: String, v: String) -> &mut Self {
+        self.metadata.insert(s, v);
+        self
+    }
+
+    /// Adds a vector of mzs.
+    pub fn add_mzs(&mut self, mz: Vec<f64>) -> &mut Self {
+        self.mz = mz;
+        self
+    }
+
+    /// Adds a vector of intensities.
+    pub fn add_intensities(&mut self, intensities: Vec<f64>) -> &mut Self {
+        self.intensities = intensities;
+        self
+    }
 }
