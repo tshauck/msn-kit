@@ -1,6 +1,7 @@
 // (c) Copyright 2021 Trent Hauck
 // All Rights Reserved
-use std::io::Write;
+//! Module for reading and writing MGF files.
+use std::io::{Error, ErrorKind, Write};
 
 use crate::io::Format;
 use crate::spectrum::Spectrum;
@@ -72,7 +73,7 @@ where
 
             if line != "BEGIN IONS\n" {
                 return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
+                    ErrorKind::Other,
                     format!("Expected 'BEGIN IONS' to start, got {}", line),
                 ));
             }
@@ -89,8 +90,8 @@ where
                 if let Some((k, v)) = line.trim().split_once("=") {
                     s.metadata.insert(String::from(k), String::from(v));
                 } else {
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
+                    return Err(Error::new(
+                        ErrorKind::Other,
                         "Could parse key value metadata.",
                     ));
                 }
@@ -103,12 +104,12 @@ where
                     s.mz.push(new_mz);
                     s.intensities.push(new_intensity);
                 } else {
-                    return Err(std::io::Error::new(std::io::ErrorKind::Other, "Vectors"));
+                    return Err(Error::new(ErrorKind::Other, "Vectors"));
                 }
                 line.clear();
             } else {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
+                return Err(Error::new(
+                    ErrorKind::Other,
                     format!("Error parsing data: {}", line),
                 ));
             }
@@ -145,9 +146,13 @@ impl<W: Write> MGFWriter<W> {
     /// * `spectrum` - The spectrum to write.
     ///
     pub fn write(&mut self, spectrum: Spectrum) -> std::io::Result<()> {
-        match self.output_format {
+        match &self.output_format {
             Format::Mgf => self.write_mgf(spectrum),
             Format::Json => self.write_json(spectrum),
+            e => Err(Error::new(
+                ErrorKind::Other,
+                format!("Cannot parse, got output: {:?}", e),
+            )),
         }
     }
 
@@ -163,8 +168,8 @@ impl<W: Write> MGFWriter<W> {
 
         match result {
             Ok(_) => Ok(()),
-            Err(_) => Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            Err(_) => Err(Error::new(
+                ErrorKind::Other,
                 "Error writing json for spectrum.",
             )),
         }
@@ -211,8 +216,7 @@ where
 {
     type Item = std::io::Result<Spectrum>;
 
-    /// Implements the next method for the Records iterator.
-    ///
+    /// Implements the next ethod for the Records iterator.
     fn next(&mut self) -> Option<Self::Item> {
         let mut record = Spectrum::empty();
 

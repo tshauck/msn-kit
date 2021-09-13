@@ -35,6 +35,9 @@ enum SubCommand {
 
     #[clap(about = "Compute stats for inputs")]
     Stats(Stats),
+
+    #[clap(about = "Cat an MzML file.")]
+    MzMLCat(MzMLCat),
 }
 
 #[derive(Clap)]
@@ -53,6 +56,12 @@ struct Head {
 }
 
 #[derive(Clap)]
+struct MzMLCat {
+    #[clap(parse(from_os_str), about = "The input path or stdin")]
+    input: Option<PathBuf>,
+}
+
+#[derive(Clap)]
 struct FilterByKeyValue {
     #[clap(short, about = "The key to check, values missing the key are omitted")]
     key: String,
@@ -64,6 +73,7 @@ struct FilterByKeyValue {
     input: Option<PathBuf>,
 }
 
+/// Main entrypoint for the CLI.
 fn main() -> std::io::Result<()> {
     let opts: Opts = Opts::parse();
 
@@ -72,6 +82,13 @@ fn main() -> std::io::Result<()> {
     let writer = &mut io::mgf_parser::MGFWriter::new(stdout(), output_enum);
 
     match opts.subcmd {
+        SubCommand::MzMLCat(t) => match t.input {
+            None => cmds::mzml_cat::cat(stdin(), stdout()),
+            Some(p) => {
+                let f = File::open(p).unwrap();
+                cmds::mzml_cat::cat(f, stdout())
+            }
+        },
         SubCommand::Stats(t) => match t.input {
             None => cmds::stats::stats(stdin(), stdout()),
             Some(p) => {

@@ -13,5 +13,10 @@ readme = "../README.md"
 test = true
 
 [dependencies]
-serde_json = "1.0"
+base64 = { version = "0.13.0" }
+byteorder = "1"
+flate2 = "1.0"
+quick-xml = { version = "0.22", features = [ "serialize" ] }
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+structure = "0.1"
