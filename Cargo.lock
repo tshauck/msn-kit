@@ -172,7 +172,7 @@ dependencies = [
 
 [[package]]
 name = "msn-kit"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "base64",
  "byteorder",
@@ -185,7 +185,7 @@ dependencies = [
 
 [[package]]
 name = "msn-kit-cli"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "clap",
  "msn-kit",
