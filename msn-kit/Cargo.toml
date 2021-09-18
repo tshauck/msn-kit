@@ -1,6 +1,6 @@
 [package]
 name = "msn-kit"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2018"
 license = "MIT"
 description = "Library and CLI for working with Mass Spec data."

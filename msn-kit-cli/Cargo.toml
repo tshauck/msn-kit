@@ -1,6 +1,6 @@
 [package]
 name = "msn-kit-cli"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2018"
 
 [[bin]]
