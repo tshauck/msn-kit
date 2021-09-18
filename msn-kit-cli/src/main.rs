@@ -14,7 +14,7 @@ use msn_kit::io;
 #[clap(
     name = "msn-kit",
     about = "CLI for dealing with MGF files.",
-    version = "0.2.3",
+    version = "0.2.4",
     author = "Trent Hauck <trent@trenthauck.com>"
 )]
 struct Opts {
