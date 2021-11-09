@@ -5,7 +5,7 @@ use std::io::BufReader;
 use std::io::Read;
 use std::io::Write;
 
-use msn_kit::io;
+use msn_kit::io::mzml_parser::MzMLReader;
 use serde::Serialize;
 
 #[derive(Debug)]
@@ -26,7 +26,7 @@ impl<W: Write> SpectrumWriter<W> {
 pub fn cat<R: Read, W: Write>(input: R, output: W) -> std::io::Result<()> {
     let buf_reader = BufReader::new(input);
 
-    let mut reader = io::mzml_parser::parser::MzMLReader::from_reader(buf_reader);
+    let mut reader = MzMLReader::from_reader(buf_reader);
     let mut writer = SpectrumWriter { writer: output };
 
     loop {
