@@ -26,4 +26,5 @@
 )]
 
 pub mod io;
+pub mod similarity;
 pub mod spectrum;

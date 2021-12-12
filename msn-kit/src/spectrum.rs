@@ -4,6 +4,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt;
 
 /// # Examples
 ///
@@ -23,6 +24,13 @@ pub struct Spectrum {
     pub intensities: Vec<f64>,
 }
 
+impl fmt::Display for Spectrum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let json_string = serde_json::to_string(&self).unwrap();
+        write!(f, "{}", json_string)
+    }
+}
+
 impl Spectrum {
     /// Create a new Spectrum.
     ///
@@ -40,7 +48,7 @@ impl Spectrum {
         }
     }
 
-    /// Returns an empty is Spectrum.
+    /// Returns an empty Spectrum.
     ///
     pub fn empty() -> Self {
         Self {
