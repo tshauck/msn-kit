@@ -39,9 +39,7 @@ SUBCOMMANDS:
     stats              Compute stats for inputs
 ```
 
-Yours may look different depending on the version that was installed vs the
-last time this README was updated 😄. You'll also likely want to place `mm` is a
-location that is on your `PATH`.
+The above command assumes the directory to `mm` has been placed on your path.
 
 ## Installation
 
