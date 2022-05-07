@@ -7,10 +7,10 @@ use std::path::PathBuf;
 
 mod cmds;
 
-use clap::Clap;
+use clap::Parser;
 use msn_kit::io;
 
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(
     name = "msn-kit",
     about = "CLI for dealing with MGF files.",
@@ -18,58 +18,60 @@ use msn_kit::io;
     author = "Trent Hauck <trent@trenthauck.com>"
 )]
 struct Opts {
-    #[clap(short, about = "The output file to write to", default_value = "mgf")]
+    #[clap(short, help = "The output file to write to", default_value = "mgf")]
     output_format: io::Format,
 
     #[clap(subcommand)]
     subcmd: SubCommand,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 enum SubCommand {
-    #[clap(about = "Similar to head(1) in that it can output the top n records from an MGF file")]
+    #[clap(
+        override_help = "Similar to head(1) in that it can output the top n records from an MGF file"
+    )]
     Head(Head),
 
-    #[clap(about = "Select spectra based on the key value pairs in the metadata")]
+    #[clap(override_help = "Select spectra based on the key value pairs in the metadata")]
     MetadataFilter(FilterByKeyValue),
 
-    #[clap(about = "Compute stats for inputs")]
+    #[clap(override_help = "Compute stats for inputs")]
     Stats(Stats),
 
-    #[clap(about = "Cat an MzML file.")]
+    #[clap(override_help = "Cat an MzML file.")]
     MzMLCat(MzMLCat),
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Stats {
-    #[clap(parse(from_os_str), about = "The input path or stdin")]
+    #[clap(parse(from_os_str), help = "The input path or stdin")]
     input: Option<PathBuf>,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Head {
-    #[clap(short, about = "How many records to print", default_value = "5")]
+    #[clap(short, help = "How many records to print", default_value = "5")]
     number: i32,
 
-    #[clap(parse(from_os_str), about = "The input path or stdin")]
+    #[clap(parse(from_os_str), help = "The input path or stdin")]
     input: Option<PathBuf>,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct MzMLCat {
-    #[clap(parse(from_os_str), about = "The input path or stdin")]
+    #[clap(parse(from_os_str), help = "The input path or stdin")]
     input: Option<PathBuf>,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct FilterByKeyValue {
-    #[clap(short, about = "The key to check, values missing the key are omitted")]
+    #[clap(short, help = "The key to check, values missing the key are omitted")]
     key: String,
 
-    #[clap(short, about = "The value for key, only equal values are kept")]
+    #[clap(short, help = "The value for key, only equal values are kept")]
     value: Option<String>,
 
-    #[clap(parse(from_os_str), about = "The input path or stdin")]
+    #[clap(parse(from_os_str), help = "The input path or stdin")]
     input: Option<PathBuf>,
 }
 

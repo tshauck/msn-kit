@@ -47,8 +47,8 @@ impl FromStr for Format {
 }
 
 mod tests {
-    use crate::io::Format;
     use std::str::FromStr;
+    use crate::io::Format;
 
     #[test]
     fn from_str() {
